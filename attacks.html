@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Attacks – HTTP vs HTTPS</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo"><a href="../index.html" style="text-decoration:none;color:inherit">🔐 HTTP<span>vs</span>HTTPS</a></div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="compare.html">Compare</a></li>
+      <li><a href="dataflow.html">Data Flow</a></li>
+      <li><a href="login-sim.html">Login Sim</a></li>
+      <li><a href="attacks.html" class="active">Attacks</a></li>
+      <li><a href="tls.html">SSL/TLS</a></li>
+    </ul>
+  </nav>
+
+  <div class="page">
+    <h1>💀 Common Attacks on HTTP</h1>
+    <p class="lead">Unencrypted HTTP is vulnerable to several well-known attacks. HTTPS mitigates all of these.</p>
+
+    <div class="section-block" style="border-left:3px solid var(--red)">
+      <h2>1. Man-in-the-Middle (MITM)</h2>
+      <p style="color:var(--muted);margin-bottom:1rem;line-height:1.9">
+        An attacker positions themselves between the client and server, intercepting all communication.
+        With HTTP, they can read and even <strong style="color:var(--red)">modify</strong> the data in transit.
+      </p>
+      <pre>Client ──── [ATTACKER intercepts + reads/modifies] ──── Server
+      
+Example: Attacker sees your bank credentials in plain text.
+         Attacker can change "transfer $10" to "transfer $10000".</pre>
+      <div class="tag danger">HTTP: VULNERABLE &nbsp;|&nbsp; HTTPS: PROTECTED ✅</div>
+    </div>
+
+    <div class="section-block" style="border-left:3px solid var(--red)">
+      <h2>2. Packet Sniffing / Eavesdropping</h2>
+      <p style="color:var(--muted);margin-bottom:1rem;line-height:1.9">
+        Tools like <strong>Wireshark</strong> can capture all network traffic on a local network.
+        Over HTTP, every request — including passwords, session tokens, and private messages — is visible.
+      </p>
+      <pre>$ wireshark -i eth0
+
+Captured Packet:
+  HTTP POST /login
+  username=nikita&password=mypassword123  ← EXPOSED ⚠️</pre>
+      <div class="tag danger">HTTP: VULNERABLE &nbsp;|&nbsp; HTTPS: PROTECTED ✅</div>
+    </div>
+
+    <div class="section-block" style="border-left:3px solid var(--red)">
+      <h2>3. Session Hijacking</h2>
+      <p style="color:var(--muted);margin-bottom:1rem;line-height:1.9">
+        After you log in, a session cookie is issued. Over HTTP, this cookie is transmitted in plain text
+        and can be stolen by an attacker to impersonate you without needing your password.
+      </p>
+      <pre>HTTP Request Headers (intercepted):
+  Cookie: session_id=abc123xyz  ← Attacker steals this!
+
+Attacker replays:
+  GET /dashboard HTTP/1.1
+  Cookie: session_id=abc123xyz  ← Now impersonating you!</pre>
+      <div class="tag danger">HTTP: VULNERABLE &nbsp;|&nbsp; HTTPS: PROTECTED ✅</div>
+    </div>
+
+    <div class="section-block" style="border-left:3px solid var(--red)">
+      <h2>4. SSL Stripping</h2>
+      <p style="color:var(--muted);margin-bottom:1rem;line-height:1.9">
+        An attacker downgrades a connection from HTTPS to HTTP.
+        The user thinks they are on HTTPS, but the attacker intercepts an unencrypted version.
+        <strong style="color:var(--green)">HSTS (HTTP Strict Transport Security)</strong> prevents this attack.
+      </p>
+      <pre>User types: https://bank.com
+Attacker: "I'll downgrade that to http://bank.com"
+User gets: http://bank.com  ← Unencrypted without knowing!
+
+Defense: HSTS Header forces HTTPS always.</pre>
+      <div class="tag danger">HTTP: VULNERABLE &nbsp;|&nbsp; HTTPS + HSTS: PROTECTED ✅</div>
+    </div>
+
+    <div class="section-block" style="border-left:3px solid var(--green)">
+      <h2>✅ How HTTPS Prevents All of These</h2>
+      <table class="styled-table">
+        <thead><tr><th>Attack</th><th>HTTP</th><th>HTTPS</th></tr></thead>
+        <tbody>
+          <tr><td>Man-in-the-Middle</td><td class="red">❌ Vulnerable</td><td class="green">✅ Encrypted tunnel</td></tr>
+          <tr><td>Packet Sniffing</td><td class="red">❌ Plain text exposed</td><td class="green">✅ Ciphertext only</td></tr>
+          <tr><td>Session Hijacking</td><td class="red">❌ Cookies readable</td><td class="green">✅ Cookies encrypted</td></tr>
+          <tr><td>SSL Stripping</td><td class="red">❌ No SSL at all</td><td class="green">✅ HSTS enforces HTTPS</td></tr>
+          <tr><td>Data Tampering</td><td class="red">❌ Can be modified</td><td class="green">✅ Integrity guaranteed</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>Mini Project — HTTP vs HTTPS | Dr. D.Y. Patil Institute of Technology, Pimpri, Pune</p>
+  </footer>
+  <script src="../js/main.js"></script>
+</body>
+</html>
